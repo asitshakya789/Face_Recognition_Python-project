@@ -1,129 +1,138 @@
-# 🧑‍💻 Face-Recognition-Project
+# Face Recognition (Python, OpenCV, dlib)
 
-![Owner Avatar](https://avatars.githubusercontent.com/u/140405662?v=4)
+A small, resume-friendly face recognition demo built with Python, OpenCV, and `face_recognition` (dlib). It loads a set of known face images, then recognizes faces in a live webcam stream.
 
-Welcome to the **Face Recognition Project** — a real-time face recognition solution built with Python, OpenCV, and the face_recognition library.  
-Identify faces from live video feeds and images with speed and accuracy.
+Optional: if `deepface` is installed, the script also displays an estimated age.
 
----
+## What this project demonstrates
 
-## 🗂️ Repository Structure
+- Real-time face detection + face embedding extraction (`face_recognition`/dlib)
+- Nearest-match identification against a known face gallery
+- Simple computer-vision UI overlays (name + confidence)
+- Defensive coding (missing images, no-face-in-image handling, optional dependencies)
 
-```
-Face-Recognition-project/
-├── 📁 .venv
-├── 📁 Age estimation
-├── 📄 .gitignore
-├── 🖼️ Asit picture.jpg
-├── 🖼️ Dheeraj picture.png
-├── 📄 Project Synopsis.docx
-├── 📄 README.md
-├── 🖼️ Sharaddha.jpg
-├── 🖼️ Tamanna.jpeg
-├── 🎬 Video Demo.mp4
-├── 📦 dlib-19.19.0-cp38-cp38-win_amd64.whl
-├── 🖼️ face reco.jpg
-├── 📄 face.pptx
-├── 🐍 face.py
-├── 🖼️ shahid.jpg
-├── 🖼️ virat.png
-```
+## Repository contents
 
----
+This repository is intentionally small and centered around one script:
 
-## 🧠 Project Overview
+- [face.py](face.py): main script
+- [dlib-19.19.0-cp38-cp38-win_amd64.whl](dlib-19.19.0-cp38-cp38-win_amd64.whl): Windows wheel used by `face_recognition` (Python 3.8)
+- Sample media files (images / pptx / docx / demo video)
 
-This project provides a Python script for real-time face recognition.  
-The script captures video from your camera, detects faces, and matches them against known images.
+Note: the sample images in the root folder are demo assets. For a professional portfolio, replace them with images you have permission to use (see “Ethics & privacy”).
 
-**Key Features:**
-- 🚀 Dynamic Loading: Load any number of facial images for identification.
-- 🎥 Real-Time Recognition: Identify faces in live video feeds.
-- 👥 Multiple Person Support: Distinguish between multiple known faces.
-- 🧑 Age Estimation: (See `Age estimation/` for details.)
+## Requirements
 
----
+- Windows 10/11
+- Python 3.8 (recommended for the included dlib wheel)
+- A working webcam
 
-## ⚙️ Installation Guide (Windows)
+Python packages:
 
-### 1️⃣ Install Python
+- `opencv-python`
+- `face-recognition`
 
-Download and install Python 3.8 (or later) from [python.org](https://www.python.org/).
+Optional (for age estimation):
 
-```bash
-python --version
+- `deepface` (may pull heavier ML dependencies depending on your environment)
+
+## Setup (Windows)
+
+The repo includes a prebuilt `dlib` wheel for Python 3.8 on 64-bit Windows. If you use a different Python version, you may need to build/install `dlib` another way.
+
+1) Create and activate a virtual environment
+
+PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-### 2️⃣ Create a Virtual Environment
+2) Upgrade pip
 
-```bash
-python -m venv venv
+```powershell
+python -m pip install --upgrade pip
 ```
 
-### 3️⃣ Install dlib and cmake
+3) Install dependencies
 
-Run Command Prompt as administrator, navigate to your project folder, and install the wheel:
-
-```bash
-pip install dlib-19.19.0-cp38-cp38-win_amd64.whl
-pip install cmake
+```powershell
+pip install opencv-python face-recognition
 ```
 
-### 4️⃣ Upgrade pip (if necessary)
+If `face-recognition` fails due to `dlib`, install the provided wheel:
 
-```bash
-pip install --upgrade pip
-```
-
-### 5️⃣ Install Face Recognition
-
-```bash
+```powershell
+pip install .\dlib-19.19.0-cp38-cp38-win_amd64.whl
 pip install face-recognition
 ```
 
-### 6️⃣ Install OpenCV
+Optional (age estimation):
 
-```bash
-pip install opencv-python
+```powershell
+pip install deepface
 ```
 
----
+## Configure known faces
 
-## 🏃‍♂️ Running the Project
+Edit the `people` list in [face.py](face.py). Each entry maps a display name to an image file path.
 
-1. Place all known face images in the project folder.
-2. In the script, specify paths to each image and assign names.
-3. Run the script:
+Guidelines for best results:
 
-    ```bash
-    python face.py
-    ```
+- Use a clear, front-facing photo
+- One face per image
+- Good lighting, minimal occlusion
 
-4. Press `q` to end the video broadcast.
+If a “known” image contains no detectable face, the script will raise a clear error message.
 
----
+## Run
 
-## 🔧 Configuration
+```powershell
+python face.py
+```
 
-- Adjust the `tolerance` parameter in `compare_faces` to improve recognition accuracy.
+Controls:
 
----
+- Press `q` to quit.
 
-## 🤝 Contributions & Permissions
+## How matching works (high level)
 
-- We welcome your contributions!  
-  Open pull requests and issues to help make this project better.
-- For licensing details, see [LICENSE](LICENSE).
-- This project is released under the MIT License.
+1) Known images are encoded into 128-D face embeddings (dlib via `face_recognition`).
+2) Each detected face in the webcam frame is encoded the same way.
+3) The script computes distances between the detected embedding and all known embeddings.
+4) If the smallest distance is below a threshold (default: `0.60`), the corresponding name is shown. Otherwise, the face is labeled “Unknown”.
 
----
+The on-screen “Confidence” value is displayed as `1 - distance` (a simple heuristic for readability; it is not a calibrated probability).
 
-## 📬 Contact
+## Troubleshooting
 
-Feel free to reach out via [GitHub Issues](https://github.com/Asit-14/Face-Recognition-project/issues) for questions or suggestions.
+- Camera doesn’t open
+  - Close other apps using the webcam (Zoom/Teams/Browser tabs).
+  - If you have multiple cameras, adjust `camera_index` in the code.
 
-**Owner:** [Asit-14](https://github.com/Asit-14)
+- `ImportError` / build errors for `dlib`
+  - Use Python 3.8 on Windows and install the included wheel.
+  - On other Python versions, you may need a different wheel or a build toolchain.
 
----
+- `deepface` install is slow / fails
+  - Age estimation is optional. The script runs without it.
+  - If installed, `deepface` may require additional ML dependencies depending on your system.
 
-Happy coding & stay recognized! 😃
+## Limitations
+
+- This is a demo; it is not production-grade authentication.
+- Recognition accuracy depends heavily on lighting, camera quality, pose, and dataset quality.
+- Face recognition may perform differently across demographic groups; evaluate carefully.
+
+## Ethics & privacy
+
+- Obtain consent before collecting or using any facial images.
+- Avoid using face recognition for high-stakes decisions.
+- Store biometric data securely and follow applicable laws/policies.
+
+## Project notes for a resume
+
+- Highlight: real-time CV pipeline (capture → detect → embed → match → overlay)
+- Highlight: robustness improvements (optional `deepface`, clear error handling)
+- Highlight: Windows-specific dependency handling (`dlib` wheel constraints)
